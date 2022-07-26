@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 
 void main() {
   runApp(MaterialApp(
-    home: const LoginPage(),
     theme: ThemeData(primarySwatch: Colors.purple),
+    initialRoute: "/login",
+    routes: {
+      "/login": (context) => const LoginPage(),
+      "/home": (context) => const HomePage()
+    },
   ));
 }
 
@@ -29,57 +33,53 @@ class _LoginPageState extends State<LoginPage> {
   late String username;
   late String password;
   var isLoading = false;
-  var isLogged = false;
   final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return isLogged
-        ? const HomePage()
-        : Scaffold(
-            appBar: AppBar(),
-            body: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextFormField(
-                      decoration: const InputDecoration(labelText: "Username"),
-                      validator: (value) => validateUserName(username: value),
-                      onSaved: (value) => username = value!,
-                    ),
-                    TextFormField(
-                      decoration: const InputDecoration(labelText: "password"),
-                      obscureText: true,
-                      validator: (value) => validatePassword(password: value),
-                      onSaved: (value) => password = value!,
-                    ),
-                    const SizedBox(
-                      height: 32,
-                    ),
-                    if (isLoading)
-                      const CircularProgressIndicator()
-                    else
-                      TextButton(
-                          style: ButtonStyle(
-                              backgroundColor:
-                                  MaterialStateProperty.all(Colors.purple)),
-                          onPressed: () async {
-                            if (validate()) {
-                              await Login(
-                                  username: username, password: password);
-                            }
-                          },
-                          child: const Text(
-                            "Entrar",
-                            style: TextStyle(color: Colors.white),
-                          ))
-                  ],
+    return Scaffold(
+        appBar: AppBar(),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 32),
+          child: Form(
+            key: formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(labelText: "Username"),
+                  validator: (value) => validateUserName(username: value),
+                  onSaved: (value) => username = value!,
                 ),
-              ),
-            ));
+                TextFormField(
+                  decoration: const InputDecoration(labelText: "password"),
+                  obscureText: true,
+                  validator: (value) => validatePassword(password: value),
+                  onSaved: (value) => password = value!,
+                ),
+                const SizedBox(
+                  height: 32,
+                ),
+                if (isLoading)
+                  const CircularProgressIndicator()
+                else
+                  TextButton(
+                      style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all(Colors.purple)),
+                      onPressed: () async {
+                        if (validate()) {
+                          await Login(username: username, password: password);
+                        }
+                      },
+                      child: const Text(
+                        "Entrar",
+                        style: TextStyle(color: Colors.white),
+                      ))
+              ],
+            ),
+          ),
+        ));
   }
 
   bool validate() {
@@ -113,8 +113,7 @@ class _LoginPageState extends State<LoginPage> {
     isLoading = false;
     setState(() {});
     if (response && responseApi) {
-      isLogged = true;
-      setState(() {});
+      Navigator.pushNamed(context, "/home");
       print("abrindo a home page");
     }
   }
